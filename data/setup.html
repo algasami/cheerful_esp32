@@ -1,18 +1,72 @@
 <!DOCTYPE html>
 <html>
+  <style>
+    body {
+      font-size: large;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    .center {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+    }
+    .main-content {
+      max-width: 50rem;
+    }
+    .input-flex {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+  </style>
+  <script>
+    let hidden = true
+    function init()
+    {
+      const showhide = document.getElementById("show_hide")
+      showhide.onclick = () => {
+        hidden = !hidden
+        update()
+      }
+      update()
+    }
+    function update()
+    {
+      const pinput = document.getElementById("password_input")
+      const showhide = document.getElementById("show_hide")
+      showhide.textContent = hidden ? "show" : "hide"
+      pinput.type = hidden ? "password" : "text"
+    }
+    window.onload = init
+  </script>
   <head>
     <title>Setup WiFi</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
-    <h3>Setup WiFi - Cheerful ESP32</h3>
-    <br /><br />
-    <form action="/init" method="POST">
-      <br />
-      SSID: <input type="text" name="SSID" />
-      <br />
-      Password: <input type="text" name="Password" />
-      <input type="submit" value="Submit" />
-    </form>
+    <div class="center">
+      <main class="main-content">
+        <h3>WiFi Setup Wizard</h3>
+        <p>
+          This is a barebone WiFi setup system.
+        </p>
+        <form action="/init" method="POST">
+          <br />
+          <span class="input-flex">
+            <span>SSID:</span>
+            <input type="text" name="SSID" />
+          </span>
+          <span class="input-flex">
+            <span>Password:</span>
+            <span>
+              <input id="password_input" type="password" name="Password" />
+              <button type="button" id="show_hide"></button>
+            </span>
+          </span>
+          <input type="submit" value="Submit" />
+        </form>
+      </main>
+    </div>
   </body>
 </html>

@@ -21,5 +21,5 @@ void loop()
 {
     unsigned long current_time = millis();
     poll_wifi(current_time);
-    poll_dns();
+    poll_web();
 }

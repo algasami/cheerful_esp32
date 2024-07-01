@@ -33,7 +33,6 @@ void setup_web_for_wifi()
 {
     Serial.println("[Setup Web For WiFi] Initializing");
     dns_server = new DNSServer;
-    captive_handler = ;
     web_server = new AsyncWebServer(80);
     web_server->on("/init", HTTP_POST, [](AsyncWebServerRequest *request) {
         if (!request->hasParam("SSID", true) || !request->hasParam("Password", true))
@@ -43,8 +42,8 @@ void setup_web_for_wifi()
         }
         AsyncWebParameter *ssid = request->getParam("SSID", true);
         AsyncWebParameter *pswd = request->getParam("Password", true);
-        set_wifi(ssid->value(), pswd->value());
         request->send(200, "text/plain", "Sent...");
+        set_wifi(ssid->value(), pswd->value());
     });
     web_server->addHandler(new CaptiveRequestHandler); // this would get cleaned up by websever
     web_server->begin();
@@ -52,7 +51,6 @@ void setup_web_for_wifi()
     Serial.println("[Setup Web For WiFi] Initialized");
 }
 
-bool b_cleanuped = false;
 void cleanup_web_for_wifi()
 {
     Serial.println("[Setup Web For WiFi] Cleaning up");
@@ -63,15 +61,25 @@ void cleanup_web_for_wifi()
     Serial.println("[Setup Web For WiFi] Cleaned up");
 }
 
-void poll_dns()
+void setup_web()
+{
+    Serial.println("[Setup Web] Initializing");
+    web_server = new AsyncWebServer(80);
+    web_server->on("/", HTTP_GET, [](AsyncWebServerRequest *req) { req->send(200, "text/plain", "Welcome!"); });
+    Serial.println("[Setup Web] Initialized");
+    web_server->begin();
+}
+
+void cleanup_web()
+{
+    web_server->end();
+    delete web_server;
+}
+
+void poll_web()
 {
     if (!bWiFiConnected)
     {
         dns_server->processNextRequest();
-    }
-    else if (!b_cleanuped)
-    {
-        b_cleanuped = true;
-        cleanup_web_for_wifi();
     }
 }

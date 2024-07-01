@@ -28,13 +28,12 @@ class CaptiveRequestHandler : public AsyncWebHandler
 
 AsyncWebServer *web_server;
 DNSServer *dns_server;
-CaptiveRequestHandler *captive_handler;
 
 void setup_web_for_wifi()
 {
     Serial.println("[Setup Web For WiFi] Initializing");
     dns_server = new DNSServer;
-    captive_handler = new CaptiveRequestHandler;
+    captive_handler = ;
     web_server = new AsyncWebServer(80);
     web_server->on("/init", HTTP_POST, [](AsyncWebServerRequest *request) {
         if (!request->hasParam("SSID", true) || !request->hasParam("Password", true))
@@ -47,7 +46,7 @@ void setup_web_for_wifi()
         set_wifi(ssid->value(), pswd->value());
         request->send(200, "text/plain", "Sent...");
     });
-    web_server->addHandler(captive_handler);
+    web_server->addHandler(new CaptiveRequestHandler); // this would get cleaned up by websever
     web_server->begin();
     dns_server->start(53, "*", WiFi.softAPIP());
     Serial.println("[Setup Web For WiFi] Initialized");

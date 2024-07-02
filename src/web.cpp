@@ -20,21 +20,20 @@ class CaptiveRequestHandler : public AsyncWebHandler
 
     void handleRequest(AsyncWebServerRequest *request)
     {
-        Serial.println("[Captive Handler] Responding...");
         request->send(LittleFS, "/setup.html");
-        Serial.println("[Captive Handler] Sent!");
     }
 };
 
-AsyncWebServer *web_server;
-DNSServer *dns_server;
+AsyncWebServer web_server(80);
+DNSServer dns_server;
+CaptiveRequestHandler captive_handler;
 
 void setup_web_for_wifi()
 {
     Serial.println("[Setup Web For WiFi] Initializing");
-    dns_server = new DNSServer;
-    web_server = new AsyncWebServer(80);
-    web_server->on("/init", HTTP_POST, [](AsyncWebServerRequest *request) {
+    web_server.on("/", HTTP_GET, [](AsyncWebServerRequest *req) { req->send(200, "text/plain", "Welcome!"); });
+    web_server.on("/setup", HTTP_GET, [](AsyncWebServerRequest *req) { req->send(LittleFS, "/setup.html"); });
+    web_server.on("/init", HTTP_POST, [](AsyncWebServerRequest *request) {
         if (!request->hasParam("SSID", true) || !request->hasParam("Password", true))
         {
             request->send(400, "text/plain", "Corrupted input...");
@@ -45,41 +44,13 @@ void setup_web_for_wifi()
         request->send(200, "text/plain", "Sent...");
         set_wifi(ssid->value(), pswd->value());
     });
-    web_server->addHandler(new CaptiveRequestHandler); // this would get cleaned up by websever
-    web_server->begin();
-    dns_server->start(53, "*", WiFi.softAPIP());
+    web_server.addHandler(&captive_handler);
+    web_server.begin();
+    dns_server.start(53, "*", WiFi.softAPIP());
     Serial.println("[Setup Web For WiFi] Initialized");
-}
-
-void cleanup_web_for_wifi()
-{
-    Serial.println("[Setup Web For WiFi] Cleaning up");
-    dns_server->stop();
-    web_server->end();
-    delete web_server;
-    delete dns_server;
-    Serial.println("[Setup Web For WiFi] Cleaned up");
-}
-
-void setup_web()
-{
-    Serial.println("[Setup Web] Initializing");
-    web_server = new AsyncWebServer(80);
-    web_server->on("/", HTTP_GET, [](AsyncWebServerRequest *req) { req->send(200, "text/plain", "Welcome!"); });
-    Serial.println("[Setup Web] Initialized");
-    web_server->begin();
-}
-
-void cleanup_web()
-{
-    web_server->end();
-    delete web_server;
 }
 
 void poll_web()
 {
-    if (!bWiFiConnected)
-    {
-        dns_server->processNextRequest();
-    }
+    dns_server.processNextRequest();
 }

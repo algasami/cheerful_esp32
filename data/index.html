@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en_US">
+  <style>
+    body {
+      font-size: large;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    .center {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+    }
+    .main-content {
+      max-width: 50rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: black;
+        color: white;
+      }
+    }
+  </style>
+  <script>
+    window.onload = () => {
+        setInterval(async ()=>{
+            // since the interval is long, i'm not planning to use websocket.
+            let data = {}
+            try {
+                data = await (await fetch("/status")).json()
+            } catch (err) {
+                console.error("Cannot serialize /status json!")
+            }
+            console.log(data)
+        }, 1000)
+    }
+  </script>
+  <head>
+    <title>Cheerful ESP32</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <div class="center">
+      <main class="main-content">
+        <h3>Cheerful ESP32 - Dashboard</h3>
+        This is a monitor that constantly probes the device's status.
+      </main>
+    </div>
+  </body>
+</html>

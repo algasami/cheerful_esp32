@@ -46,7 +46,7 @@ void set_wifi(const String &in_ssid, const String &in_password)
     Serial.println("[Set WiFi] Received Data...");
     ssid = String(in_ssid);         // clone
     password = String(in_password); // clone
-    Serial.printf("SSID:%s\nPassword:%s\n", ssid.c_str(), password.c_str());
+    Serial.printf("SSID:%s\n", ssid.c_str());
     WiFi.begin(ssid, password);
     Serial.println("[Set WiFi] AP_STA Mode Complete!");
 };

@@ -13,6 +13,7 @@ void setup()
     {
         Serial.println("[LittleFS] Mounted!");
     }
+
     setup_wifi();
     setup_web_for_wifi();
 }

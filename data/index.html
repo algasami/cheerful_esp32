@@ -22,15 +22,18 @@
   </style>
   <script>
     window.onload = () => {
-        setInterval(async ()=>{
+        setInterval(()=>{
             // since the interval is long, i'm not planning to use websocket.
-            let data = {}
-            try {
-                data = await (await fetch("/status")).json()
-            } catch (err) {
-                console.error("Cannot serialize /status json!")
-            }
-            console.log(data)
+            fetch("/status")
+              .catch((err) => console.log("Failed to fetch /status!"))
+              .then(raw => raw.json())
+              .catch((err) => console.log("Failed to serialize!")).then(val => {
+                const elem = document.getElementById("wifi_connected_data")
+                if(elem)
+                {
+                  elem.textContent = val.wifi_connected ? "true" : "false"
+                }
+              })
         }, 1000)
     }
   </script>
@@ -43,6 +46,27 @@
       <main class="main-content">
         <h3>Cheerful ESP32 - Dashboard</h3>
         This is a monitor that constantly probes the device's status.
+        <table>
+          <thead>
+            <tr>
+              <th>
+                WiFi Connected
+              </th>
+              <th>
+                Truth
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="wifi_connected_data">
+              </td>
+              <td>
+                true
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </main>
     </div>
   </body>

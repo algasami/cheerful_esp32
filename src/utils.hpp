@@ -8,5 +8,8 @@ void set_wifi(const String &ssid, const String &password);
 void poll_wifi(unsigned long int);
 void poll_web();
 
+namespace Flags
+{
 extern bool bWiFiConnected;
 extern bool bWiFiSetup;
+} // namespace Flags

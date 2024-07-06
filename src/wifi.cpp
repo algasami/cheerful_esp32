@@ -1,10 +1,12 @@
 #include "utils.hpp"
 #include <WiFi.h>
+#include <string.h>
 
-bool bWiFiConnected = false;
-bool bWiFiSetup = false;
+bool Flags::bWiFiConnected = false;
+bool Flags::bWiFiSetup = false;
 
-String ssid, password;
+// * .bss-allocated to prevent heap frag
+char ssid_cache[20], password_cache[20];
 
 void setup_wifi()
 {
@@ -25,18 +27,18 @@ void poll_wifi(unsigned long int current_time)
 
     if (WiFi.status() != WL_CONNECTED)
     {
-        if (bWiFiConnected)
+        if (Flags::bWiFiConnected)
         {
             Serial.println("[Poll WiFi] WiFi Disconnected!");
-            bWiFiConnected = false;
+            Flags::bWiFiConnected = false;
             setup_wifi();
         }
         return;
     }
 
-    if (bWiFiConnected == false)
+    if (Flags::bWiFiConnected == false)
     {
-        bWiFiConnected = true;
+        Flags::bWiFiConnected = true;
         Serial.printf("[Poll WiFi] WiFi Connected!\nIP:%s\n", WiFi.localIP().toString().c_str());
     }
 }
@@ -44,9 +46,9 @@ void poll_wifi(unsigned long int current_time)
 void set_wifi(const String &in_ssid, const String &in_password)
 {
     Serial.println("[Set WiFi] Received Data...");
-    ssid = String(in_ssid);         // clone
-    password = String(in_password); // clone
-    Serial.printf("SSID:%s\n", ssid.c_str());
-    WiFi.begin(ssid, password);
+    strcpy(ssid_cache, in_ssid.c_str());         // clone
+    strcpy(password_cache, in_password.c_str()); // clone
+    Serial.printf("SSID:%s\n", ssid_cache);
+    WiFi.begin(ssid_cache, password_cache);
     Serial.println("[Set WiFi] AP_STA Mode Complete!");
-};
+}
